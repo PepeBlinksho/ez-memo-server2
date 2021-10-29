@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Crypt;
 
 class MemoController extends Controller
 {
+    /**
+     * メモ参照API
+     *
+     * @param Request $request
+     * @return void
+     */
     public function view(Request $request)
     {
         $key = $request->get(key: 'key', default: null);
@@ -61,8 +67,11 @@ class MemoController extends Controller
 
         $memo->save();
 
+        $encryptUUID = Crypt::encryptString($uuid);
+
         return response()->json([
             'key' => Crypt::encryptString($uuid),
+            'url' => 'http://localhost/api/v1/memos?key='.$encryptUUID,
         ]);
     }
 }
