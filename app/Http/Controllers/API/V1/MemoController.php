@@ -71,7 +71,51 @@ class MemoController extends Controller
 
         return response()->json([
             'key' => Crypt::encryptString($uuid),
-            'url' => 'http://localhost/api/v1/memos?key='.$encryptUUID,
+            'url' => 'http://localhost/api/v1/memos?key=' . $encryptUUID,
         ]);
+    }
+
+    /**
+     * メモ更新API
+     *
+     * @param Request $request
+     * @param string $id
+     * @return void
+     */
+    public function update(Request $request, string $id)
+    {
+        $key = $request->get(key: 'key', default: null);
+
+        if (!$key) {
+            throw new ApiAuthException(message: 'no auth');
+        }
+
+        try {
+            $uuid = Crypt::decryptString($key);
+
+            if ($uuid !== $key) {
+                throw new ApiAuthException(message: 'no auth');
+            }
+
+            $memo = Memo::findOrFail($uuid);
+
+            $this->validate($request, [
+                'folder_id' => 'nullable|integer',
+                'title' => 'required|string',
+                'contents' => 'required',
+                'is_public' => 'nullable|boolean',
+            ]);
+
+            $memo->folder_id = $request->get(key: 'folder_id', default: null);
+            $memo->title = $request->get(key: 'title');
+            $memo->contents = $request->get(key: 'contents');
+            $memo->is_public = $request->get(key: 'is_public', default: false);
+
+            $memo->update();
+
+            return response()->json($memo);
+        } catch (DecryptException $e) {
+            return response()->json($e);
+        }
     }
 }
