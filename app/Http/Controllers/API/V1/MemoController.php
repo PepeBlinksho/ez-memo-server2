@@ -72,7 +72,7 @@ class MemoController extends Controller
         return response()->json([
             'key' => Crypt::encryptString($uuid),
             'url' => 'http://localhost/api/v1/memos?key=' . $encryptUUID,
-        ]);
+        ], status: 201);
     }
 
     /**
@@ -114,6 +114,31 @@ class MemoController extends Controller
             $memo->update();
 
             return response()->json($memo);
+        } catch (DecryptException $e) {
+            return response()->json($e);
+        }
+    }
+
+    public function delete(Request $request, string $id)
+    {
+        $key = $request->get(key: 'key', default: null);
+
+        if (!$key) {
+            throw new ApiAuthException(message: 'no auth');
+        }
+
+        try {
+            $uuid = Crypt::decryptString($key);
+
+            if ($uuid !== $key) {
+                throw new ApiAuthException(message: 'no auth');
+            }
+
+            $memo = Memo::findOrFail($uuid);
+
+            $memo->delete();
+
+            return response()->json(['status' => 'OK'], status:204);
         } catch (DecryptException $e) {
             return response()->json($e);
         }
