@@ -70,6 +70,7 @@ class MemoController extends Controller
         $encryptUUID = Crypt::encryptString($uuid);
 
         return response()->json([
+            'id' => $uuid,
             'key' => Crypt::encryptString($uuid),
             'url' => 'http://localhost/api/v1/memos?key=' . $encryptUUID,
         ], status: 201);
@@ -86,18 +87,23 @@ class MemoController extends Controller
     {
         $key = $request->get(key: 'key', default: null);
 
-        if (!$key) {
+        if (!$key and $request->user() === null) {
             throw new ApiAuthException(message: 'no auth');
         }
 
         try {
-            $uuid = Crypt::decryptString($key);
-
-            if ($uuid !== $key) {
-                throw new ApiAuthException(message: 'no auth');
+            if (!$request->user()) {
+                $uuid = Crypt::decryptString($key);
+                if ($uuid !== $id) {
+                    throw new ApiAuthException(message: 'no auth');
+                }
             }
 
             $memo = Memo::findOrFail($uuid);
+
+            if ($memo->user_id !== $request->user()->id) {
+                throw new ApiAuthException(message: 'no auth', code:403);
+            }
 
             $this->validate($request, [
                 'folder_id' => 'nullable|integer',
@@ -130,7 +136,7 @@ class MemoController extends Controller
         try {
             $uuid = Crypt::decryptString($key);
 
-            if ($uuid !== $key) {
+            if ($uuid !== $id) {
                 throw new ApiAuthException(message: 'no auth');
             }
 
@@ -138,7 +144,7 @@ class MemoController extends Controller
 
             $memo->delete();
 
-            return response()->json(['status' => 'OK'], status:204);
+            return response()->json(['status' => 'OK'], status: 204);
         } catch (DecryptException $e) {
             return response()->json($e);
         }
