@@ -9,5 +9,10 @@ class Memo extends Model
 {
     use HasFactory;
 
-    protected $keyType = "string";
+    /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
 }
