@@ -37,6 +37,10 @@ class MemoResource extends JsonResource
         ];
     }
 
+    /**
+     * ID暗号
+     * @return string
+     */
     private function encryptUUID()
     {
         return Crypt::encryptString($this->id);

@@ -1,6 +1,8 @@
 <?php
 
+
 namespace App\Repositories;
+
 
 use App\Http\Requests\MemoRequest;
 use App\Models\Memo;

@@ -1,10 +1,10 @@
 <?php
 
+
 namespace App\Exceptions;
 
-use Exception;
 
-class ApiAuthException extends Exception
+class ApiAuthException extends \Exception
 {
-    //
+
 }
