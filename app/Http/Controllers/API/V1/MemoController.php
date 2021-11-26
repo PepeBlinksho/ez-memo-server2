@@ -28,6 +28,21 @@ class MemoController extends Controller
         $this->memoRepository = $memoRepository;
     }
 
+    public function memos()
+    {
+        return MemoResource::collection(
+            Memo::where('is_archive', false)
+                ->where('is_public')
+                ->orWhere(function ($query) {
+                    $query->where('is_archive', false);
+                    $query->where('user_id', request()->user()->id);
+                })
+                ->orderBy('user_id')
+                ->latest()
+                ->simplePaginate(30)
+        );
+    }
+
     /**
      * メモ参照API
      * @param Request $request
