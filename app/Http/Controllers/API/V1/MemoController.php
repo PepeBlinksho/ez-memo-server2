@@ -28,19 +28,21 @@ class MemoController extends Controller
         $this->memoRepository = $memoRepository;
     }
 
+    /**
+     * メモリストAPI
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
     public function memos()
     {
-        return MemoResource::collection(
-            Memo::where('is_archive', false)
-                ->where('is_public')
-                ->orWhere(function ($query) {
-                    $query->where('is_archive', false);
-                    $query->where('user_id', request()->user()->id);
-                })
-                ->orderBy('user_id')
-                ->latest()
-                ->simplePaginate(30)
-        );
+        return MemoResource::collection(Memo::where('is_archive', false)
+            ->where('is_public', true)
+            ->orWhere(function ($query) {
+                $query->where('is_archive', false);
+                $query->where('user_id', request()->user()->id ?? 0);
+            })
+            ->orderBy('user_id', 'desc')
+            ->latest()
+            ->simplePaginate(30));
     }
 
     /**

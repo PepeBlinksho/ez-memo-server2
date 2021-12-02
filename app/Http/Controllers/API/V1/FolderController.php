@@ -12,12 +12,11 @@ class FolderController extends Controller
 {
     /**
      * フォルダー一覧API
-     *
-     * @return void
+     * @return \Illuminate\Http\JsonResponse
      */
     public function folders()
     {
-        return response()->json(Folder::where('user_id', request()->id)
+        return response()->json(Folder::where('user_id', request()->user()->id)
             ->where('parent_id', null)
             ->with(['children'])
             ->get());
@@ -25,60 +24,60 @@ class FolderController extends Controller
 
     /**
      * フォルダー作成API
-     *
      * @param Request $request
-     * @return void
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
     {
         $this->validate($request, [
             'name' => 'required|string',
-            'parent_id' => 'integer',
+            'parent_id' => 'nullable|string',
         ]);
 
         $folder = new Folder();
         $folder->id = Str::uuid()->toString();
-        $folder->name = $request->get(key: 'name');
-        $folder->parent_id = $request->get(key: 'parent_id', default:null);
-        $folder->user_id = $request->get(key: 'user_id', default:4);
+        $folder->name = $request->get('name');
+        $folder->parent_id = $request->get('parent_id', null);
+        $folder->user_id = $request->user()->id;
         $folder->save();
 
-        return response()->json(['status' => 'OK'], status:201);
+        return response()->json(['status' => 'OK'], 201);
     }
 
     /**
      * フォルダー更新API
-     *
      * @param Request $request
      * @param Folder $folder
-     * @return void
+     * @return \Illuminate\Http\JsonResponse
+     * @throws ApiAuthException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function update(Request $request, Folder $folder)
     {
         $this->validate($request, [
             'name' => 'required|string',
-            'parent_id' => 'required|integer',
+            'parent_id' => 'nullable|string',
         ]);
 
         if ($folder->user_id !== $request->user()->id) {
             throw new ApiAuthException('no auth');
         }
 
-        $folder->name = $request->get(key: 'name');
-        $folder->parent_id = $request->get(key: 'parent_id', default:null);
-        $folder->user_id = $request->get(key: 'user_id');
+        $folder->name = $request->get('name');
+        $folder->parent_id = $request->get('parent_id', null);
         $folder->update();
 
-        return response()->json(['status' => 'OK'], status:201);
+        return response()->json(['status' => 'OK'], 202);
     }
-
 
     /**
      * フォルダー削除API
-     *
      * @param Request $request
      * @param Folder $folder
-     * @return void
+     * @return \Illuminate\Http\JsonResponse
+     * @throws ApiAuthException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function delete(Request $request, Folder $folder)
     {
@@ -86,10 +85,8 @@ class FolderController extends Controller
             throw new ApiAuthException('no auth');
         }
 
-        dd($folder);
-
         $folder->delete();
 
-        return response()->json(['status' => 'OK'], status:202);
+        return response()->json(['status' => 'OK'], 204);
     }
 }

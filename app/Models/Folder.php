@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Folder extends Model
 {
     use HasFactory;
+
     /**
      * The "type" of the primary key ID.
      *
@@ -16,9 +17,8 @@ class Folder extends Model
     protected $keyType = 'string';
 
     /**
-     * 子フォルダ
-     *
-     * @return void
+     * 子フォルダー
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function children()
     {

@@ -32,7 +32,7 @@ class MemoRequest extends FormRequest
                 return [];
             default:
                 return [
-                    'folder_id' => 'nullable|integer',
+                    'folder_id' => 'nullable|string',
                     'title' => 'required|string',
                     'contents' => 'required',
                     'is_public' => 'nullable|boolean',
