@@ -15,4 +15,17 @@ class Memo extends Model
      * @var string
      */
     protected $keyType = 'string';
+
+    /**
+     * 検索用フィルター
+     * @param $query
+     * @param $keyword
+     */
+    public function scopeFilter($query, $keyword)
+    {
+        if ($keyword) {
+            $query->where('title', 'LIKE', '%'.$keyword.'%');
+            $query->orWhere('contents', 'LIKE', '%'.$keyword.'%');
+        }
+    }
 }

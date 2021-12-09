@@ -25,6 +25,7 @@ class MemoResource extends JsonResource
                 'folder_id' => $this->folder_id,
                 'is_public' => (bool)$this->is_public,
                 'is_archive' => (bool)$this->is_archive,
+                'created_at_humans' => $this->created_at->diffForHumans(),
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
             ],
