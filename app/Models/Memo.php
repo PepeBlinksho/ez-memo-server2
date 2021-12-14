@@ -21,11 +21,17 @@ class Memo extends Model
      * @param $query
      * @param $keyword
      */
-    public function scopeFilter($query, $keyword)
+    public function scopeFilter($query)
     {
+        $keyword = request('keyword',  null);
         if ($keyword) {
             $query->where('title', 'LIKE', '%'.$keyword.'%');
             $query->orWhere('contents', 'LIKE', '%'.$keyword.'%');
+        }
+
+        $folderId = request('folder_id',  null);
+        if ($folderId) {
+            $query->where('folder_id', $folderId);
         }
     }
 }

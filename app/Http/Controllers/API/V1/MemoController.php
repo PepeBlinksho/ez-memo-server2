@@ -40,7 +40,7 @@ class MemoController extends Controller
                 $query->where('is_archive', false);
                 $query->where('user_id', request()->user()->id ?? 0);
             })
-            ->filter(request('keyword',  null))
+            ->filter()
             ->orderBy('user_id', 'desc')
             ->latest()
             ->simplePaginate(30));
