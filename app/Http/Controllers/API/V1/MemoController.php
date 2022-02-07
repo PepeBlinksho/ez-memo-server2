@@ -43,7 +43,7 @@ class MemoController extends Controller
             ->filter()
             ->orderBy('user_id', 'desc')
             ->latest()
-            ->simplePaginate(30));
+            ->simplePaginate(3));
     }
 
     /**
